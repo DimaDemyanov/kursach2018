@@ -1,41 +1,35 @@
 package accounts;
 
+import DB.DataBase;
+
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author v.chibrikov
- *         <p>
- *         Пример кода для курса на https://stepic.org/
- *         <p>
- *         Описание курса и лицензия: https://github.com/vitaly-chibrikov/stepic_java_webserver
- */
 public class AccountService {
-    private final Map<String, UserProfile> loginToProfile;
-    private final Map<String, UserProfile> sessionIdToProfile;
+    private final DataBase db;
 
-    public AccountService() {
-        loginToProfile = new HashMap<>();
-        sessionIdToProfile = new HashMap<>();
+    public AccountService(DataBase db) {
+       this.db = db;
     }
 
-    public void addNewUser(UserProfile userProfile) {
-        loginToProfile.put(userProfile.getLogin(), userProfile);
+    public void createNewUser(UserProfile userProfile) throws Exception {
+        if(db.select("Login", userProfile.getLogin()).length == 0) {
+
+            String data[] = {userProfile.getLogin(), Integer.toString(userProfile.getPass()), Boolean.toString(userProfile.isAdmin())};
+            db.insert(data);
+        }
+        else{
+            throw new Exception("login already exist");
+        }
     }
 
-    public UserProfile getUserByLogin(String login) {
-        return loginToProfile.get(login);
-    }
+    /*public String getPass(String login){
+        db.select("Login", login);
 
-    public UserProfile getUserBySessionId(String sessionId) {
-        return sessionIdToProfile.get(sessionId);
-    }
+    }*/
 
-    public void addSession(String sessionId, UserProfile userProfile) {
-        sessionIdToProfile.put(sessionId, userProfile);
-    }
-
-    public void deleteSession(String sessionId) {
-        sessionIdToProfile.remove(sessionId);
+    public UserProfile getUserByLogin(String login){
+        String[] datab = db.select("Login", login)[0].split(" ");
+        return new UserProfile(datab[0], Integer.valueOf(datab[1]), Boolean.valueOf(datab[2]));
     }
 }

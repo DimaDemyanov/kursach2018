@@ -8,14 +8,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Scanner;
 
-public class DirectRequestServlet extends HttpServlet {
-    public DirectRequestServlet() {
+
+public class LoginServlet extends HttpServlet {
+    public LoginServlet() {
     }
 
-    //get logged user profile
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) throws ServletException, IOException {
-        FileInputStream fileInputStream = new FileInputStream("C:/Users/Anastasiia/Desktop/Java/stepic_java_webserver/L2.1 Authorization/public_html/catalog.html");
+        FileInputStream fileInputStream = new FileInputStream("C:/Users/Anastasiia/Desktop/Java/stepic_java_webserver/L2.1 Authorization/public_html/auth.html");
         Scanner scanner = new Scanner(fileInputStream);
         String s = "";
         while(scanner.hasNext()){
@@ -24,5 +24,4 @@ public class DirectRequestServlet extends HttpServlet {
         response.setContentType("text/html;charset=windows-1251");
         response.getWriter().println(s);
     }
-
 }

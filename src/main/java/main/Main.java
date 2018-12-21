@@ -1,38 +1,37 @@
 package main;
 
+import DB.DataBase;
 import accounts.AccountService;
-import accounts.UserProfile;
+import accounts.ShopService;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import servlets.DirectRequestServlet;
-import servlets.SessionsServlet;
-import servlets.UsersServlet;
+import servlets.*;
 
-/**
- * @author v.chibrikov
- *         <p>
- *         Пример кода для курса на https://stepic.org/
- *         <p>
- *         Описание курса и лицензия: https://github.com/vitaly-chibrikov/stepic_java_webserver
- */
 public class Main {
     public static void main(String[] args) throws Exception {
-        AccountService accountService = new AccountService();
 
-        accountService.addNewUser(new UserProfile("admin"));
-        accountService.addNewUser(new UserProfile("test"));
+        DataBase dataBase2 = new DataBase("shop.txt");
+        ShopService shopService = new ShopService(dataBase2);
+
+        DataBase dataBase = new DataBase("users.txt"); // хранить пароли в файле как хеши
+        AccountService accountService = new AccountService(dataBase);
 
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        //context.addServlet(new ServletHolder(new UsersServlet(accountService)), "/api/v1/users");
+        //context.AddServlet(new ServletHolder(new UsersServlet(accountService)), "/api/v1/users");
         context.addServlet(new ServletHolder(new SessionsServlet(accountService)), "/auth");
         context.addServlet(new ServletHolder(new DirectRequestServlet()), "/");
+        context.addServlet(new ServletHolder(new LoginServlet()), "/login");
+        context.addServlet(new ServletHolder(new RegistServlet(accountService)),"/reg");
+        context.addServlet(new ServletHolder(new InitDataBaseServlet(dataBase, dataBase2)),"/init");
+        context.addServlet(new ServletHolder(new AddServlet(shopService)), "/add");
+        context.addServlet(new ServletHolder(new AllRequestsServlet(dataBase2)), "/main");
 
         ResourceHandler resource_handler = new ResourceHandler();
-        resource_handler.setResourceBase("public_html");
+       // resource_handler.setResourceBase("public_html");
 
         HandlerList handlers = new HandlerList();
         handlers.setHandlers(new Handler[]{resource_handler, context});

@@ -8,15 +8,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Scanner;
 
-/**
- * @author v.chibrikov
- *         <p>
- *         Пример кода для курса на https://stepic.org/
- *         <p>
- *         Описание курса и лицензия: https://github.com/vitaly-chibrikov/stepic_java_webserver
- */
 public class SessionsServlet extends HttpServlet {
     private final AccountService accountService;
 
@@ -25,7 +20,7 @@ public class SessionsServlet extends HttpServlet {
     }
 
     //get logged user profile
-    public void doGet(HttpServletRequest request,
+    /*public void doGet(HttpServletRequest request,
                       HttpServletResponse response) throws ServletException, IOException {
         System.out.println("!!!");
         String sessionId = request.getSession().getId();
@@ -41,7 +36,7 @@ public class SessionsServlet extends HttpServlet {
             response.getWriter().println(json);
             response.setStatus(HttpServletResponse.SC_OK);
         }
-    }
+    }*/
 
     //sign in
     public void doPost(HttpServletRequest request,
@@ -49,29 +44,44 @@ public class SessionsServlet extends HttpServlet {
         String login = request.getParameter("login");
         String pass = request.getParameter("pass");
 
-        if (login == null || pass == null) {
+     if (login == null || pass == null) {
             response.setContentType("text/html;charset=utf-8");
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
-        }
+     }
 
         UserProfile profile = accountService.getUserByLogin(login);
-        if (profile == null || !profile.getPass().equals(pass)) {
+        if (profile == null || !(profile.getPass() == pass.hashCode())) {
             response.setContentType("text/html;charset=utf-8");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
-        accountService.addSession(request.getSession().getId(), profile);
-        Gson gson = new Gson();
-        String json = gson.toJson(profile);
-        response.setContentType("text/html;charset=utf-8");
-        response.getWriter().println(json);
-        response.setStatus(HttpServletResponse.SC_OK);
+       /* if(profile.getLogin() == "admin"){
+            FileInputStream fileInputStream = new FileInputStream("C:/Users/Anastasiia/Desktop/Java/stepic_java_webserver/L2.1 Authorization/public_html/profileAdmin.html");
+            Scanner scanner = new Scanner(fileInputStream);
+            String s = "";
+            while(scanner.hasNext()){
+                s += scanner.nextLine();
+            }
+            response.setContentType("text/html;charset=windows-1251");
+            response.getWriter().println(s);
+        }
+        else{
+            FileInputStream fileInputStream = new FileInputStream("C:/Users/Anastasiia/Desktop/Java/stepic_java_webserver/L2.1 Authorization/public_html/catalog.html");
+            Scanner scanner = new Scanner(fileInputStream);
+            String s = "";
+            while(scanner.hasNext()){
+                s += scanner.nextLine();
+            }
+            response.setContentType("text/html;charset=windows-1251");
+            response.getWriter().println(s);
+        }*/
+
     }
 
     //sign out
-    public void doDelete(HttpServletRequest request,
+   /* public void doDelete(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
         String sessionId = request.getSession().getId();
         UserProfile profile = accountService.getUserBySessionId(sessionId);
@@ -85,5 +95,5 @@ public class SessionsServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_OK);
         }
 
-    }
+    }*/
 }
