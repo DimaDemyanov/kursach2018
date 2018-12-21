@@ -8,9 +8,13 @@ import javax.servlet.ServletException;// добавление таблицы в 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpCookie;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class AddServlet extends HttpServlet {
@@ -27,7 +31,7 @@ public class AddServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) throws ServletException, IOException {
-        FileInputStream fileInputStream = new FileInputStream("C:/Users/Anastasiia/Desktop/Java/stepic_java_webserver/L2.1 Authorization/public_html/add.html");
+        FileInputStream fileInputStream = new FileInputStream("public_html/add.html");
         Scanner scanner = new Scanner(fileInputStream);
         String s = "";
         while(scanner.hasNext()){
@@ -39,12 +43,23 @@ public class AddServlet extends HttpServlet {
 
     public void doPost(HttpServletRequest request,
                        HttpServletResponse response) throws ServletException, IOException {
+        Part photoPart = request.getPart("photo");
+        String fileName = "photos" + "//" + Paths.get(photoPart.getSubmittedFileName()).getFileName().toString();
+        FileOutputStream outputStream = new FileOutputStream(fileName);
+        InputStream inputStream = photoPart.getInputStream();
+        int x;
+        try {
+            while ((x = inputStream.read()) != -1) {
+                outputStream.write(x);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
         String name = request.getParameter("name");
         String count = request.getParameter("count");
         String cost = request.getParameter("cost");
-        String photo = request.getParameter("photo");
 
-        DataBaseShop dataBaseShop = new DataBaseShop(name, cost, count, photo);
+        DataBaseShop dataBaseShop = new DataBaseShop(name, cost, count, fileName);
         try {
             shopService.createNewThing(dataBaseShop);
         } catch (Exception e) {

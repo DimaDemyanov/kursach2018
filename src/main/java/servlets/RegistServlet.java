@@ -21,7 +21,7 @@ public class RegistServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response) throws ServletException, IOException {
-        FileInputStream fileInputStream = new FileInputStream("C:/Users/Anastasiia/Desktop/Java/stepic_java_webserver/L2.1 Authorization/public_html/reg.html");
+        FileInputStream fileInputStream = new FileInputStream("public_html/reg.html");
         Scanner scanner = new Scanner(fileInputStream);
         String s = "";
         while(scanner.hasNext()){

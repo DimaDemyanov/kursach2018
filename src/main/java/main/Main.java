@@ -11,6 +11,8 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import servlets.*;
 
+import javax.servlet.MultipartConfigElement;
+
 public class Main {
     public static void main(String[] args) throws Exception {
 
@@ -21,13 +23,15 @@ public class Main {
         AccountService accountService = new AccountService(dataBase);
 
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        ServletHolder addHolder = new ServletHolder(new AddServlet(shopService));
+        addHolder.getRegistration().setMultipartConfig(new MultipartConfigElement("data/tmp"));
         //context.AddServlet(new ServletHolder(new UsersServlet(accountService)), "/api/v1/users");
         context.addServlet(new ServletHolder(new SessionsServlet(accountService)), "/auth");
         context.addServlet(new ServletHolder(new DirectRequestServlet()), "/");
         context.addServlet(new ServletHolder(new LoginServlet()), "/login");
         context.addServlet(new ServletHolder(new RegistServlet(accountService)),"/reg");
         context.addServlet(new ServletHolder(new InitDataBaseServlet(dataBase, dataBase2)),"/init");
-        context.addServlet(new ServletHolder(new AddServlet(shopService)), "/add");
+        context.addServlet(addHolder, "/add");
         context.addServlet(new ServletHolder(new AllRequestsServlet(dataBase2)), "/main");
 
         ResourceHandler resource_handler = new ResourceHandler();
